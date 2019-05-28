@@ -16,11 +16,7 @@ cp:=)
 #	x86_64 | amd64) GOARCH="amd64" ;; \
 #	ppc64el | ppc64le) GOARCH="ppc64le" ;; \
 #esac;)
-#GOARCH:=$(shell case "$${arch##*-}" in x86_64 | amd64) echo "amd64" ;; ppc64el | ppc64le) echo "ppc64le" ;; *) echo "unsupported" ;; esac)
-#GOARCH:=$(shell case $${`uname -m`} in x86_64 | amd64$) echo "amd64" ;; ppc64el | ppc64le) echo "ppc64le" ;; *) echo "unsupported" ;; esac)
-archcase:= case ${arch} in x86_64 | amd64) echo "amd64" ;; ppc64el | ppc64le) echo "ppc64le" ;; *) echo "unsupported" ;; esac
 GOARCH:=$(shell case ${arch} in  x86_64 | amd64${cp} echo "amd64" ;; ppc64el | ppc64le${cp} echo "ppc64le" ;; *${cp} echo "unsupported" ;; esac)
-$(info ${GOARCH})
 
 VERSION = $(shell git describe --dirty --tags --always)
 REPO = github.com/operator-framework/operator-sdk
