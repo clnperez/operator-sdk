@@ -10,6 +10,7 @@ else
 endif
 
 arch:=$(shell uname -m)
+cp:=)
 
 #$(shell case "${arch##*-}" in \
 #	x86_64 | amd64) GOARCH="amd64" ;; \
@@ -18,7 +19,7 @@ arch:=$(shell uname -m)
 #GOARCH:=$(shell case "$${arch##*-}" in x86_64 | amd64) echo "amd64" ;; ppc64el | ppc64le) echo "ppc64le" ;; *) echo "unsupported" ;; esac)
 #GOARCH:=$(shell case $${`uname -m`} in x86_64 | amd64$) echo "amd64" ;; ppc64el | ppc64le) echo "ppc64le" ;; *) echo "unsupported" ;; esac)
 archcase:= case ${arch} in x86_64 | amd64) echo "amd64" ;; ppc64el | ppc64le) echo "ppc64le" ;; *) echo "unsupported" ;; esac
-GOARCH:=$(shell $(archcase))
+GOARCH:=$(shell case ${arch} in  x86_64 | amd64${cp} echo "amd64" ;; ppc64el | ppc64le${cp} echo "ppc64le" ;; *${cp} echo "unsupported" ;; esac)
 $(info ${GOARCH})
 
 VERSION = $(shell git describe --dirty --tags --always)
