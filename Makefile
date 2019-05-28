@@ -56,10 +56,15 @@ release_x86_64 := \
 	build/operator-sdk-$(VERSION)-x86_64-linux-gnu \
 	build/operator-sdk-$(VERSION)-x86_64-apple-darwin
 
+release_ppc64le := \
+	build/operator-sdk-$(VERSION)-ppc64le-linux-gnu
+
 release: clean $(release_x86_64) $(release_x86_64:=.asc)
 
-build/operator-sdk-%-x86_64-linux-gnu: GOARGS = GOOS=linux GOARCH=amd64
-build/operator-sdk-%-x86_64-apple-darwin: GOARGS = GOOS=darwin GOARCH=amd64
+build/operator-sdk-%-x86_64-linux-gnu: GOARGS = GOOS=linux GOARCH=${GOARCH}
+build/operator-sdk-%-x86_64-apple-darwin: GOARGS = GOOS=darwin GOARCH=${GOARCH}
+build/operator-sdk-%-ppc64le-linux-gnu: GOARGS = GOOS=linux GOARCH=${GOARCH}
+
 
 build/%: $(SOURCES)
 	$(Q)$(GOARGS) go build -gcflags "all=-trimpath=${GOPATH}" -asmflags "all=-trimpath=${GOPATH}" -o $@ $(BUILD_PATH)
@@ -131,8 +136,8 @@ image/build: image/build/ansible image/build/helm image/build/scorecard-proxy
 image/build/ansible: build/operator-sdk-dev-x86_64-linux-gnu
 	./hack/image/build-ansible-image.sh $(ANSIBLE_BASE_IMAGE):dev
 
-image/build/helm: build/operator-sdk-dev-x86_64-linux-gnu
-	./hack/image/build-helm-image.sh $(HELM_BASE_IMAGE):dev
+image/build/helm: build/operator-sdk-dev-x86_64-linux-gnu build/operator-sdk-dev-ppc64le-linux-gnu
+	./hack/image/build-helm-image.sh ${GOARCH} $(HELM_BASE_IMAGE):dev
 
 image/build/scorecard-proxy:
 	./hack/image/build-scorecard-proxy-image.sh $(SCORECARD_PROXY_BASE_IMAGE):dev
