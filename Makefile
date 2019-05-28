@@ -12,7 +12,7 @@ endif
 arch:=$(shell uname -m)
 cp:=)
 GOARCH:=$(shell case ${arch} in \
-	x86_64 | amd64${cp} echo "amd64" ;; \
+	x86_64 | amd64 | darwin${cp} echo "x86_64" ;; \
 	ppc64el | ppc64le${cp} echo "ppc64le" ;;\
 	*${cp} echo "unsupported" ;;\
 esac)
