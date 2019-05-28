@@ -9,6 +9,18 @@ else
        Q = @
 endif
 
+arch:=$(shell uname -m)
+
+#$(shell case "${arch##*-}" in \
+#	x86_64 | amd64) GOARCH="amd64" ;; \
+#	ppc64el | ppc64le) GOARCH="ppc64le" ;; \
+#esac;)
+#GOARCH:=$(shell case "$${arch##*-}" in x86_64 | amd64) echo "amd64" ;; ppc64el | ppc64le) echo "ppc64le" ;; *) echo "unsupported" ;; esac)
+#GOARCH:=$(shell case $${`uname -m`} in x86_64 | amd64$) echo "amd64" ;; ppc64el | ppc64le) echo "ppc64le" ;; *) echo "unsupported" ;; esac)
+archcase:= case ${arch} in x86_64 | amd64) echo "amd64" ;; ppc64el | ppc64le) echo "ppc64le" ;; *) echo "unsupported" ;; esac
+GOARCH:=$(shell $(archcase))
+$(info ${GOARCH})
+
 VERSION = $(shell git describe --dirty --tags --always)
 REPO = github.com/operator-framework/operator-sdk
 BUILD_PATH = $(REPO)/cmd/operator-sdk
@@ -139,5 +151,6 @@ image/push/helm:
 
 image/push/scorecard-proxy:
 	./hack/image/push-image-tags.sh $(SCORECARD_PROXY_BASE_IMAGE):dev $(SCORECARD_PROXY_IMAGE)
+
 
 .PHONY: image image/build image/build/ansible image/build/helm image/push image/push/ansible image/push/helm
