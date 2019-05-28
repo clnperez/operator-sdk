@@ -11,12 +11,11 @@ endif
 
 arch:=$(shell uname -m)
 cp:=)
-
-#$(shell case "${arch##*-}" in \
-#	x86_64 | amd64) GOARCH="amd64" ;; \
-#	ppc64el | ppc64le) GOARCH="ppc64le" ;; \
-#esac;)
-GOARCH:=$(shell case ${arch} in  x86_64 | amd64${cp} echo "amd64" ;; ppc64el | ppc64le${cp} echo "ppc64le" ;; *${cp} echo "unsupported" ;; esac)
+GOARCH:=$(shell case ${arch} in \
+	x86_64 | amd64${cp} echo "amd64" ;; \
+	ppc64el | ppc64le${cp} echo "ppc64le" ;;\
+	*${cp} echo "unsupported" ;;\
+esac)
 
 VERSION = $(shell git describe --dirty --tags --always)
 REPO = github.com/operator-framework/operator-sdk
