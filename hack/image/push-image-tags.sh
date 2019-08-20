@@ -11,12 +11,16 @@ source hack/lib/image_lib.sh
 # the base image name in pushed image tags.
 #
 function push_image_tags() {
+
+    set -x
   source_image=$1; shift || fatal "${FUNCNAME} usage error"
   push_image=$1; shift || push_image=$source_image
 
   print_image_info $source_image
   print_git_tags
-  docker_login
+ 
+  image_name=$push_image
+  docker_login $image_name
 
   if [[ -z $TRAVIS ]] ; then
     push_dryrun $source_image $push_image  && exit 0

@@ -14,6 +14,7 @@ function push_manifest_list() {
   push_image=$1; shift || fatal "${FUNCNAME} usage error"
   arches=$@
 
+  image_name=$push_image # @TODO bug workaround
   docker_login $push_image
 
   if [[ -z $TRAVIS ]] ; then

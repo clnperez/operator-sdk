@@ -56,7 +56,7 @@ x_base_steps:
   # Base deploy job
   - &deploy
     stage: deploy
-    if: type != pull_request AND ( tag IS present OR branch = master OR commit_message =~ /\[travis deploy\]/ )
+    #if: type != pull_request AND ( tag IS present OR branch = master OR commit_message =~ /\[travis deploy\]/ )
     <<: *go_before_install
     install: make install
     before_script:
@@ -72,7 +72,7 @@ x_base_steps:
   # Manifest list deploy job
   - &manifest-deploy
     stage: deploy-manifest
-    if: type != pull_request AND ( tag IS present OR branch = master OR commit_message =~ /\[travis deploy\]/ )
+    #if: type != pull_request AND ( tag IS present OR branch = master OR commit_message =~ /\[travis deploy\]/ )
     before_script:
       - git config remote.origin.fetch +refs/heads/*:refs/remotes/origin/*
       - git fetch --unshallow --tags
@@ -83,29 +83,43 @@ x_base_steps:
     services:
       - docker
 
+  # Manifest list test job
+  - &manifest-test
+    stage: test-manifest
+    #if: type != pull_request AND ( tag IS present OR branch = master OR commit_message =~ /\[travis deploy\]/ )
+    before_script:
+      - git config remote.origin.fetch +refs/heads/*:refs/remotes/origin/*
+      - git fetch --unshallow --tags
+    after_success:
+      - echo "Image via manifest list pulled successfully"
+    after_failure:
+      - echo "Unable to pull image using manifest list"
+    services:
+      - docker
+
 jobs:
   include:
     # Build and test go
-    - <<: *test
-      name: Go on OpenShift
-      script: make test/ci-go
+    # - <<: *test
+    #  name: Go on OpenShift
+    #  script: make test/ci-go
 
     # Build and test ansible
-    - <<: *test
-      name: Ansible on OpenShift
-      before_script: sudo pip install ansible
-      script: make test/ci-ansible
+    # - <<: *test
+    #  name: Ansible on OpenShift
+    #  before_script: sudo pip install ansible
+    #  script: make test/ci-ansible
 
     # Build and test helm
-    - <<: *test
-      name: Helm on OpenShift
-      script: make test/ci-helm
+    #- <<: *test
+    #  name: Helm on OpenShift
+    #  script: make test/ci-helm
 
     # Run the unit, sanity, and markdown tests
     - stage: test
       name: Unit, Sanity, and Markdown Tests
       # Currently, prow/api-ci tests all PRs that target master; use travis for post merge testing and non-master PRs
-      if: type != pull_request OR branch != master
+      #if: type != pull_request OR branch != master
       <<: *dep_before_install
       script: make test/sanity test/unit test/markdown
       after_success: echo 'Tests Passed'
@@ -146,3 +160,17 @@ jobs:
       name: Manifest list for helm-operator
       script:
         - make image/push/helm-multiarch
+
+    # Pull an image via the manifest list on amd64
+    - <<: *manifest-test
+      name: Manifest list test for helm operator (amd64)
+      os: linux
+      script:
+        - make image/verify/helm-multiarch
+
+    # Pull an image via the manifest list on ppc64le
+    - <<: *manifest-test
+      name: Manifest list test for helm operator (ppc64le)
+      os: linux-ppc64le
+      script:
+        - make image/verify/helm-multiarch

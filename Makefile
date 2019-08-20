@@ -188,6 +188,9 @@ image/push/helm:
 image/push/helm-multiarch:
 	./hack/image/push-manifest-list.sh $(HELM_IMAGE) ${HELM_ARCHES}
 
+image/verify/helm-multiarch:
+	./hack/image/verify-image-tags.sh $(HELM_IMAGE)
+
 image/push/scorecard-proxy:
 	./hack/image/push-image-tags.sh $(SCORECARD_PROXY_BASE_IMAGE):dev $(SCORECARD_PROXY_IMAGE)
 
